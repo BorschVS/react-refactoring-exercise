@@ -1,0 +1,42 @@
+{
+  "actions": [
+    {
+      "id": "1",
+      "link": "https://www.github.com/user/repo/commit/abc123",
+      "obfuscated": "commit1",
+      "action_date": "2024-08-20T14:48:00.000Z"
+    },
+    {
+      "id": "2",
+      "link": "https://www.linkedin.com/feed/update/urn:li:activity:1234567890/",
+      "obfuscated": "post1",
+      "action_date": "2024-08-19T12:30:00.000Z"
+    },
+    {
+      "id": "3",
+      "link": "https://twitter.com/user/status/1234567890123456789",
+      "obfuscated": "tweet1",
+      "action_date": "2024-08-18T09:15:00.000Z"
+    },
+    {
+      "id": "4",
+      "link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "obfuscated": "video1",
+      "action_date": "2024-08-17T16:45:00.000Z"
+    },
+    {
+      "id": "5",
+      "link": "https://www.medium.com/@user/article/abc123",
+      "obfuscated": "article1",
+      "action_date": "2024-08-16T08:00:00.000Z"
+    }
+  ],
+  "usersActions": [
+    {
+      "userPersona": "John Doe",
+      "startDate": "2024-08-01",
+      "endDate": "2024-08-31",
+      "numberOfVisits": 5
+    }
+  ]
+}

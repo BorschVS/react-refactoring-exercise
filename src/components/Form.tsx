@@ -1,153 +1,64 @@
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react";
+import { FormProps } from "../types/interfaces";
+import logoUrl from '../img/logo.png'
+import { fetchPreviousActions } from "../api/operations";
 
-export default function Form() {
-    const [formLink, setFormLink] = useState('')
-    const [userPersona, setUserPersona] = useState('')
-    const [startDate, setStartDate] = useState('')
-    const [endDate, setEndDate] = useState('')
-    const [numberOfVisits, setNumberOfVisits] = useState('')
-    const [companyNumber, setCompanyNumber] = useState('')
-    const [numberIncorrect, setNumberIncorrect] = useState(0)
-    const [isFormValid, setIsFormValid] = useState(false)
-    const [buttonText, setButtonText] = useState('Next')
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [estimatedTime, setEstimatedTime] = useState('Enter number')
-    const [recentActions, setRecentActions] = useState([])
-    const [abortController, setAbortController] = useState(null)
+import styles from '../styles/Form.module.css'
+
+const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isFormValid, isProcessing }) => {
+    const [userPersona, setUserPersona] = useState<string>('');
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
+    const [numberOfVisits, setNumberOfVisits] = useState<number>(0);
+    const [companyNumber, setCompanyNumber] = useState<string>('');
+    const [numberIncorrect, setNumberIncorrect] = useState<boolean>(false);
+    const [recentActions, setRecentActions] = useState<void | []>([]);
 
     useEffect(() => {
-        fetchPreviousActions()
+        const fetchActions = async () => {
+            try {
+                const data = await fetchPreviousActions();
+                setRecentActions(data);
+            } catch (error) {
+                console.error("Failed to fetch previous actions:", error);
+            }
+        };
+
+        fetchActions();
     }, [])
-
-    const fetchPreviousActions = async () => {
-        try {
-            const response = await fetch('https://api.com/actions', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            const data = await response.json()
-            data.sort(
-                (a, b) => new Date(b.actiond_date) - new Date(a.actiond_date)
-            )
-            setRecentActions(data)
-        } catch (error) {
-            console.error('Failed to fetch recent actions', error)
-        }
-    }
-
-    const [showOverlay, setShowOverlay] = useState(false)
-
-    const renderLayout = () => (
-        <div>
-            <div>
-                <div>Analyzing...</div>
-                <button onClick={handleCancelaction}>Cancel</button>
-            </div>
-        </div>
-    )
-
-    const formatDate = (dateStr) => {
-        return dateStr.replace(/-/g, '')
-    }
-
-    const callBackendAPI = async (formData) => {
-        const controller = new AbortController()
-        setAbortController(controller)
-        formData.startDate = formatDate(formData.startDate)
-        formData.endDate = formatDate(formData.endDate)
-
-        try {
-            const response = await fetch('https://api.com/action', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                signal: controller.signal,
-            })
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            const data = await response.json()
-            setShowOverlay(false)
-            window.open(
-                'https://app.com/action/' + data.id,
-                '_blank',
-                'noopener,noreferrer'
-            )
-            window.location.reload()
-        } catch (error) {
-            if (error.name === 'AbortError') {
-                console.log('Scraping halted')
-            } else {
-                console.error('Failed to call the API', error)
-            }
-        } finally {
-            setShowOverlay(false)
-            setIsProcessing(false)
-        }
-    }
-
-    const handleCancelaction = () => {
-        if (abortController) {
-            abortController.abort() // Abort the fetch request
-        }
-        setShowOverlay(false)
-        setIsProcessing(false)
-    }
 
     useEffect(() => {
         if (!recentActions) {
             fetchPreviousActions()
         }
+        setIsFormValid(!!startDate && !!endDate && new Date(endDate) > new Date(startDate))
+    }, [setIsFormValid, numberOfVisits, startDate, endDate, recentActions]);
 
-        setIsFormValid(startDate && endDate && endDate > startDate)
-    }, [numberOfVisits, startDate, endDate])
+    useEffect(() => {
+        setFormData({
+            userPersona, startDate, endDate, numberOfVisits
+        })
+    }, [setFormData, userPersona, startDate, endDate, numberOfVisits])
 
-    const handleSubmit = async (event) => {
-        event.preventDefault()
-        if (!isFormValid) return
 
-        setShowOverlay(true)
-        setIsProcessing(true)
-
-        // Construct the form data object
-        const formData = {
-            userPersona,
-            startDate,
-            endDate,
-            numberOfVisits: parseInt(numberOfVisits, 10),
+    const handleSubmitCompanyNumber = (companyNumber: string) => {
+        setCompanyNumber(companyNumber)
+        if (companyNumber.length < 9) {
+            setNumberIncorrect(true);
+        } else {
+            setNumberIncorrect(false);
         }
-        // Calling the API with the form data
-        await callBackendAPI(formData)
-        setIsProcessing(false)
     }
 
-    const handleSubmitCompanyNumber = (number) => {
-        // this is unneeded, we've already set the value in state
-        setCompanyNumber(number)
-        if (number.length < 9) setNumberIncorrect(1)
-        else setNumberIncorrect(0)
-    }
-
-    return !numberIncorrect ? (
-        <div>
-            <div>
-                <img src={require('../imgs/LogoWhite.png')} alt="Logo" />
+    return numberIncorrect ? (
+        <div className={styles.container}>
+            <div className={styles.logoContainer}>
+                <img src={logoUrl} alt="Logo" className={styles.logo} />
             </div>
-            <div>
-                <div>Tool</div>
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="company_number">
+            <div className={styles.formWrapper}>
+                <div className={styles.title}>Tool</div>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <label htmlFor="company_number" className={styles.label}>
                         Enter your credentials
                     </label>
                     <input
@@ -157,129 +68,82 @@ export default function Form() {
                         placeholder="Company Number"
                         value={companyNumber}
                         onChange={(e) => setCompanyNumber(e.target.value)}
+                        className={styles.input}
                     />
                     <button
                         type="submit"
-                        onClick={(e) => handleSubmitCompanyNumber(companyNumber)}
+                        onClick={() => handleSubmitCompanyNumber(companyNumber)}
+                        className={styles.submitButton}
                     >
                         <span>Login</span>
                         <span>&gt;</span>
                     </button>
-                    {numberIncorrect > 0 ? (
-                        <span>The number you entered is incorrect</span>
-                    ) : (
-                        ''
+                    {numberIncorrect && (
+                        <span className={styles.errorMessage}>
+                            The number you entered is incorrect
+                        </span>
                     )}
                 </form>
             </div>
         </div>
     ) : (
-        <div>
-            <div>
-                <img
-                    src={require('../imgs/LogoWhite.png')}
-                    style={{ width: '200px', marginTop: '50px' }}
-                    alt="Logo"
-                />
-            </div>
-            <div>
+        <div className={styles.container}>
+            <div className={styles.title}>New action</div>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <div>
-                    <div>New action</div>
-                    <form style={{ marginTop: '3vh' }} onSubmit={handleSubmit}>
-                        <div>
-                            <label>
-                                Visits
-                                <span
-                                    style={{
-                                        color: 'gray',
-                                        fontWeight: 'lighter',
-                                    }}
-                                >
-                                    (optional)
-                                </span>
-                            </label>
-                            <input
-                                type="number"
-                                value={numberOfVisits}
-                                onChange={(e) => setNumberOfVisits(e.target.value)}
-                            />
-                            <label className="form-label">
-                                Define a user persona{' '}
-                                <span
-                                    style={{
-                                        color: 'gray',
-                                        fontWeight: 'lighter',
-                                    }}
-                                >
-                                    (optional)
-                                </span>
-                            </label>
-                            <input
-                                type="text"
-                                id="posts-input"
-                                value={userPersona}
-                                onChange={(e) => setUserPersona(e.target.value)}
-                            />
-                        </div>
-                        <label
-                            className="form-label"
-                            style={{ textAlign: 'left' }}
-                        >
-                            Time period{' '}
-                            <span
-                                style={{
-                                    color: 'gray',
-                                    fontWeight: 'lighter',
-                                }}
-                            >
-                                (available for dates before June 2023)
-                            </span>
-                        </label>
-
-                        <div id="time-input">
-                            <input
-                                type="date"
-                                style={{ marginRight: '20px' }}
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                            />
-                            <span style={{ fontSize: '15px' }}>to</span>
-                            <input
-                                type="date"
-                                style={{ marginLeft: '20px' }}
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className={`next-button ${isFormValid ? 'active' : ''}`}
-                            disabled={!isFormValid || isProcessing}
-                        >
-                            <span>Begin</span>
-                            <span>→</span>
-                        </button>
-                    </form>
+                    <label className={styles.label}>
+                        Visits
+                        <span className={styles.optionalText}>(optional)</span>
+                    </label>
+                    <input
+                        type="number"
+                        value={numberOfVisits}
+                        onChange={(e) => setNumberOfVisits(parseInt(e.target.value))}
+                        className={styles.input}
+                    />
+                    <label className={`${styles.label} form-label`}>
+                        Define a user persona{' '}
+                        <span className={styles.optionalText}>(optional)</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="posts-input"
+                        value={userPersona}
+                        onChange={(e) => setUserPersona(e.target.value)}
+                        className={styles.input}
+                    />
                 </div>
-                <div id="divider"></div>
+                <label className={`${styles.label} form-label`} style={{ textAlign: 'left' }}>
+                    Time period{' '}
+                    <span className={styles.optionalText}>(available for dates before June 2023)</span>
+                </label>
 
-                <div>
-                    <div>Recents</div>
-                    <div>
-                        <div>
-                            {recentActions.map((action, index) => (
-                                <div key={index}>
-                                    <a href={action.link} target="_blank">
-                                        <span>r/{action.obfuscated}</span>{' '}
-                                        <span>{action.actiond_date} (UTC)</span>
-                                    </a>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                <div id="time-input" className={styles.timeInput}>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className={styles.dateInput}
+                    />
+                    <span className={styles.toText}>to</span>
+                    <input
+                        type="date"
+                        style={{ marginLeft: '20px' }}
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className={styles.dateInput}
+                    />
                 </div>
-            </div>
-            {showOverlay ? renderLayout() : null}
-        </div>
-    )
+                <button
+                    type="submit"
+                    className={`${styles.nextButton} ${isFormValid ? styles.active : ''}`}
+                    disabled={!isFormValid || isProcessing}
+                >
+                    <span>Begin</span>
+                    <span>→</span>
+                </button>
+            </form>
+        </div>)
 }
+
+export default Form;

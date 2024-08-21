@@ -1,9 +1,8 @@
-import './App.css'
-import Form from './Form'
+import FormWrapper from './FormWrapper'
 
 const App = () => (
   <>
-    <Form />
+    <FormWrapper />
   </>
 )
 

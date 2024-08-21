@@ -1,0 +1,92 @@
+.container {
+    padding: 20px;
+}
+
+.logoContainer {
+    text-align: center;
+}
+
+.logo {
+    max-width: 100px;
+    height: auto;
+}
+
+.formWrapper {
+    margin-top: 20px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.optionalText {
+    color: gray;
+    font-weight: lighter;
+}
+
+.input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.dateInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.timeInput {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.toText {
+    font-size: 15px;
+}
+
+.submitButton,
+.nextButton {
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.submitButton:hover,
+.nextButton:hover {
+    background-color: #0056b3;
+}
+
+.active {
+    background-color: #28a745;
+}
+
+.active:hover {
+    background-color: #218838;
+}
+
+.errorMessage {
+    color: red;
+    margin-top: 10px;
+}
