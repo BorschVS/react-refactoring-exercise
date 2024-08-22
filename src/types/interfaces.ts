@@ -1,10 +1,10 @@
-import { Dispatch, FormEvent, SetStateAction } from "react";
+import { Dispatch, FormEvent, SetStateAction } from 'react';
 
 export interface Action {
   id: string;
   link: string;
   obfuscated: string;
-  actiond_date: string;
+  action_date: string;
 }
 
 export interface UserFormData {
@@ -22,6 +22,7 @@ export interface FormProps {
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
   setFormData: Dispatch<React.SetStateAction<UserFormData | undefined>>;
   setIsFormValid: Dispatch<SetStateAction<boolean>>;
+  recentActions: Action[];
   isFormValid: boolean;
   isProcessing: boolean;
 }

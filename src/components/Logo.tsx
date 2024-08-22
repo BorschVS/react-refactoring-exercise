@@ -1,11 +1,17 @@
+import { FC } from 'react';
+
 import logoUrl from '../img/logo.png'
 
-const Logo = () => (<div className='thumb'>
-    <img
-        src={logoUrl}
-        style={{ width: '200px', marginTop: '50px' }}
-        alt="Logo"
-    />
-</div>)
+import styles from '../styles/Logo.module.css'
+
+const Logo: FC = () => (
+    <div className={styles.thumb}>
+        <img
+            src={logoUrl}
+            alt="Logo"
+            width={40}
+            height={40}
+        />
+    </div>)
 
 export default Logo;

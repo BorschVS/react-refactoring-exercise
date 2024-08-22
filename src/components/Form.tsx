@@ -1,37 +1,25 @@
-import { FC, useEffect, useState } from "react";
-import { FormProps } from "../types/interfaces";
-import logoUrl from '../img/logo.png'
-import { fetchPreviousActions } from "../api/operations";
+import { FC, useEffect, useState } from 'react';
+
+import { Logo } from '../components';
+
+import { FormProps } from '../types/interfaces';
+import { fetchPreviousActions } from '../api/operations';
 
 import styles from '../styles/Form.module.css'
 
-const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isFormValid, isProcessing }) => {
+const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, recentActions, isFormValid, isProcessing }) => {
     const [userPersona, setUserPersona] = useState<string>('');
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
     const [numberOfVisits, setNumberOfVisits] = useState<number>(0);
     const [companyNumber, setCompanyNumber] = useState<string>('');
     const [numberIncorrect, setNumberIncorrect] = useState<boolean>(false);
-    const [recentActions, setRecentActions] = useState<void | []>([]);
-
-    useEffect(() => {
-        const fetchActions = async () => {
-            try {
-                const data = await fetchPreviousActions();
-                setRecentActions(data);
-            } catch (error) {
-                console.error("Failed to fetch previous actions:", error);
-            }
-        };
-
-        fetchActions();
-    }, [])
 
     useEffect(() => {
         if (!recentActions) {
             fetchPreviousActions()
         }
-        setIsFormValid(!!startDate && !!endDate && new Date(endDate) > new Date(startDate))
+        setIsFormValid(!!startDate && !!endDate && numberOfVisits >= 0 && new Date(endDate) > new Date(startDate))
     }, [setIsFormValid, numberOfVisits, startDate, endDate, recentActions]);
 
     useEffect(() => {
@@ -39,7 +27,6 @@ const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isForm
             userPersona, startDate, endDate, numberOfVisits
         })
     }, [setFormData, userPersona, startDate, endDate, numberOfVisits])
-
 
     const handleSubmitCompanyNumber = (companyNumber: string) => {
         setCompanyNumber(companyNumber)
@@ -53,7 +40,7 @@ const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isForm
     return numberIncorrect ? (
         <div className={styles.container}>
             <div className={styles.logoContainer}>
-                <img src={logoUrl} alt="Logo" className={styles.logo} />
+                <Logo />
             </div>
             <div className={styles.formWrapper}>
                 <div className={styles.title}>Tool</div>
@@ -113,9 +100,9 @@ const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isForm
                         className={styles.input}
                     />
                 </div>
-                <label className={`${styles.label} form-label`} style={{ textAlign: 'left' }}>
+                <label className={`${styles.label}`}>
                     Time period{' '}
-                    <span className={styles.optionalText}>(available for dates before June 2023)</span>
+                    <span className={styles.optionalText}>(available for dates before June 2024)</span>
                 </label>
 
                 <div id="time-input" className={styles.timeInput}>
@@ -128,7 +115,6 @@ const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isForm
                     <span className={styles.toText}>to</span>
                     <input
                         type="date"
-                        style={{ marginLeft: '20px' }}
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         className={styles.dateInput}
@@ -143,7 +129,7 @@ const Form: FC<FormProps> = ({ handleSubmit, setFormData, setIsFormValid, isForm
                     <span>→</span>
                 </button>
             </form>
-        </div>)
+        </div >)
 }
 
 export default Form;

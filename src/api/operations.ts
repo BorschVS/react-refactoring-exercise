@@ -1,42 +1,40 @@
+import axios from "axios";
 import { Action, UserFormData } from "../types/interfaces";
+
+axios.defaults.baseURL = "http://localhost:3000/";
 
 export const fetchPreviousActions = async () => {
   try {
-    const response = await fetch("http://localhost:3000/", {
-      method: "GET",
+    const response = await axios.get<Action[]>("actions", {
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = response.data;
     data.sort(
       (prev: Action, next: Action) => +new Date(next.actiond_date) - +new Date(prev.actiond_date)
     );
+
+    return data;
   } catch (error) {
     console.error("Failed to fetch recent actions", error);
   }
 };
 
 export const postUserAction = async (formData: UserFormData, controller: AbortController) => {
-  const response = await fetch("http://localhost:3000/usersPosts", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(formData),
-    signal: controller.signal,
-  });
+  try {
+    const response = await axios.post("usersActions", formData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const data = response.data;
+    window.open(`http://localhost:3000/usersActions/${data.id}`, "_blank", "noopener, noreferrer");
+    window.location.reload();
+  } catch (error) {
+    console.error("Failed to post user action", error);
   }
-
-  const data = await response.json();
-  window.open("http://localhost:3000/actions/" + data.id, "_blank", "noopener, noreferrer");
-  window.location.reload();
 };

@@ -1,8 +1,9 @@
-import FormWrapper from './FormWrapper'
+import { FC } from 'react'
+import { Actions } from '../components'
 
-const App = () => (
+const App: FC = () => (
   <>
-    <FormWrapper />
+    <Actions />
   </>
 )
 

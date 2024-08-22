@@ -33,10 +33,25 @@
   ],
   "usersActions": [
     {
+      "id": "7d81",
       "userPersona": "John Doe",
-      "startDate": "2024-08-01",
-      "endDate": "2024-08-31",
+      "startDate": "20240801",
+      "endDate": "20240831",
       "numberOfVisits": 5
+    },
+    {
+      "id": "7779",
+      "userPersona": "Vadym Borsch",
+      "startDate": "20240823",
+      "endDate": "20240825",
+      "numberOfVisits": 3
+    },
+    {
+      "id": "e439",
+      "userPersona": "12314",
+      "startDate": "20240824",
+      "endDate": "20240825",
+      "numberOfVisits": 123
     }
   ]
 }

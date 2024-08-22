@@ -1,5 +1,6 @@
-import { FC } from "react";
-import { RenderLayoutProps } from "../types/interfaces";
+import { FC } from 'react';
+
+import { RenderLayoutProps } from '../types/interfaces';
 
 import styles from '../styles/RenderLayout.module.css'
 
